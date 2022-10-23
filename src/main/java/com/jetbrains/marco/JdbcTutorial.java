@@ -1,12 +1,21 @@
 package com.jetbrains.marco;
 
 
+import com.zaxxer.hikari.HikariDataSource;
 import lombok.extern.java.Log;
 
+import javax.sql.DataSource;
 import java.sql.*;
 
 @Log
 public class JdbcTutorial {
+
+    private static DataSource createDataSource() {
+        // Hikari CP
+        HikariDataSource ds = new HikariDataSource();
+        ds.setJdbcUrl("jdbc:h2:mem:;INIT=RUNSCRIPT FROM 'classpath:users.sql'");
+        return ds;
+    }
 
     public static void main(String[] args) {
 
@@ -15,10 +24,12 @@ public class JdbcTutorial {
         PreparedStatement ps;
         ResultSet rs;
 
+        DataSource dataSource = createDataSource();
+
         try {
 
-            Connection connection =
-                    DriverManager.getConnection("jdbc:h2:mem:;INIT=RUNSCRIPT FROM 'classpath:users.sql'");
+            Connection connection = dataSource.getConnection();
+
             log.info("Connection is = " + connection.isValid(0));
 
             // CRUD
@@ -70,7 +81,6 @@ public class JdbcTutorial {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
 
 
         log.info("Ended....");
